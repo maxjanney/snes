@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "core",
+    "platform/desktop",
+    "platform/web",
+]
