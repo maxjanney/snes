@@ -22,6 +22,7 @@ bitflags! {
     }
 }
 
+#[derive(Default)]
 pub struct Registers {
     a: u16,
     x: u16,
@@ -38,16 +39,8 @@ pub struct Registers {
 impl Registers {
     pub(crate) fn new() -> Self {
         Self {
-            a: 0,
-            x: 0,
-            y: 0,
-            pc: 0,
             sp: 0x1FC,
-            psr: Psr::default(),
-            d: 0,
-            db: 0,
-            pb: 0,
-            emu_mode: false,
+            ..Default::default()
         }
     }
 }
