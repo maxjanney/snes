@@ -1,0 +1,36 @@
+Memory Map
+    - 24bit address bus (000000h-FFFFFFh)
+    - divided into 8 bit bank plus a 16 bit offset 
+        - some banks are broken into two 32 Kbyte halves (0000h-7FFFh=System Area, 8000h-FFFFh=Cartridge ROM)
+    - memory is divided into WS1 and WS2, which can be configured to have different wait states 
+    
+    Overall Memory Map
+        Bank    Offset       Content                                      Speed
+        00h-3Fh:0000h-7FFFh  System Area (8K WRAM, I/O Ports, Expansion)  see below
+        00h-3Fh:8000h-FFFFh  WS1 LoROM (max 2048 Kbytes) (64x32K)         2.68MHz
+            (00h:FFE0h-FFFFh) CPU Exception Vectors (Reset,Irq,Nmi,etc.)   2.68MHz
+        40h-7Dh:0000h-FFFFh  WS1 HiROM (max 3968 Kbytes) (62x64K)         2.68MHz
+        7Eh-7Fh:0000h-FFFFh  WRAM (Work RAM, 128 Kbytes) (2x64K)          2.68MHz
+        80h-BFh:0000h-7FFFh  System Area (8K WRAM, I/O Ports, Expansion)  see below
+        80h-BFh:8000h-FFFFh  WS2 LoROM (max 2048 Kbytes) (64x32K)         max 3.58MHz
+        C0h-FFh:0000h-FFFFh  WS2 HiROM (max 4096 Kbytes) (64x64K)         max 3.58MHz
+
+    System Area (banks 00h-3Fh and 80h-BFh)
+        Offset       Content                                              Speed
+        0000h-1FFFh  Mirror of 7E0000h-7E1FFFh (first 8Kbyte of WRAM)     2.68MHz
+        2000h-20FFh  Unused                                               3.58MHz
+        2100h-21FFh  I/O Ports (B-Bus)                                    3.58MHz
+        2200h-3FFFh  Unused                                               3.58MHz
+        4000h-41FFh  I/O Ports (manual joypad access)                     1.78MHz
+        4200h-5FFFh  I/O Ports                                            3.58MHz
+        6000h-7FFFh  Expansion                                            2.68MHz
+
+Addressing Modes
+    - Absolute
+        - the second and thrid bytes of the instruction form the LOW 16 bits 
+          of the EFFECTIVE address. the Data Bank Register contains the high order 
+          8 bits of the operand address 
+    - Absolute Indexed Indirect (a,x)
+        - the second and thrid bytes of the instruction are added with the 
+          X register to a form a 16 bit pointer into bank 0. The data bank reg.
+          contains the high order 8 bits of the effective address 

@@ -24,14 +24,30 @@ bitflags! {
 
 #[derive(Default)]
 pub struct Registers {
+    // accumulator (a=lo, b=hi, c=both)
     a: u16,
+    // x and y are paired, both must be in 8 bit or 16 bit at the same time
+    // When x and y leave 16 bit mode, their high bytes get cleared to 0
+    //
+    // index register, can be treated as a 8 bits or 16 bits
     x: u16,
+    // index register, can be treated as a 8 bits or 16 bits
     y: u16,
     pc: u16,
+    // stack pointer, holds the pointer to the stack in the RAM, relative to address $000000
     sp: u16,
+    // processor status register, holds the current processor flags
     psr: Psr,
-    d: u16,
+    // direct page used for the direct page addressing mode
+    // when accessing a memory address by its direct page notation,
+    // the value in the direct page is added to that address
+    dp: u16,
+    // data bank, holds the current data bank address. When accessing an address
+    // using the absolute addressing notation, the system uses this register to
+    // determine the bank of the given address.
     db: u8,
+    // program bank, keeps track of the current bank of the currently executed instruction
+    //
     pb: u8,
     emu_mode: bool,
 }
