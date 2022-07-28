@@ -1,4 +1,6 @@
 pub mod registers;
+pub mod interpreter;
+
 
 use registers::Registers;
 
