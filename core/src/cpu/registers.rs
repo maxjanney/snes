@@ -35,7 +35,7 @@ pub struct Registers {
     y: u16,
     // This register keeps track of the high and low bytes of the address of the currently executed instruction.
     // e.g. if there is an instruction executed at $018009, this register will hold the value $8009.
-    pc: u16,
+    pub pc: u16,
     // stack pointer, holds the pointer to the stack in RAM, relative to address $000000
     sp: u16,
     // processor status register, holds the current processor flags
@@ -43,14 +43,14 @@ pub struct Registers {
     // direct page used for the direct page addressing mode
     // when accessing a memory address by its direct page notation,
     // the value in the direct page is added to that address
-    dp: u16,
+    pub dp: u16,
     // data bank, holds the current data bank address. When accessing an address
     // using the absolute addressing notation, the system uses this register to
     // determine the bank of the given address.
     db: u8,
     // program bank, keeps track of the current bank of the currently executed instruction
     // e.g. if there is code executed at address $018009, this register will hold the value $01.
-    pb: u8,
+    pb: u32,
     // flag for 6502 emulation mode
     emu_mode: bool,
 }
@@ -61,5 +61,13 @@ impl Registers {
             sp: 0x1FC,
             ..Default::default()
         }
+    }
+
+    pub(crate) const fn program_bank(&self) -> u32 {
+        self.pb
+    }
+
+    pub(crate) fn set_program_bank(&mut self, val: u8) {
+        self.pb = (val as u32) << 16
     }
 }
