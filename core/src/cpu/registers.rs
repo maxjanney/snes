@@ -33,7 +33,7 @@ pub struct Registers {
     x: u16,
     // index register, can be treated as a 8 bits or 16 bits
     y: u16,
-    // This register keeps track of the high and low bytes of the address of the currently executed instruction. 
+    // This register keeps track of the high and low bytes of the address of the currently executed instruction.
     // e.g. if there is an instruction executed at $018009, this register will hold the value $8009.
     pc: u16,
     // stack pointer, holds the pointer to the stack in RAM, relative to address $000000
@@ -51,7 +51,7 @@ pub struct Registers {
     // program bank, keeps track of the current bank of the currently executed instruction
     // e.g. if there is code executed at address $018009, this register will hold the value $01.
     pb: u8,
-    // flag for 6502 emulation mode 
+    // flag for 6502 emulation mode
     emu_mode: bool,
 }
 
