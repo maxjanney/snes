@@ -29,6 +29,7 @@ pub trait RegisterSize: Copy {
     const IS_16: bool;
 
     fn from_u8(val: u8) -> Self;
+    fn from_u16(val: u16) -> Self;
     fn as_u8(self) -> u8;
     fn as_u16(self) -> u16;
 }
@@ -38,6 +39,10 @@ impl RegisterSize for u8 {
 
     fn from_u8(val: u8) -> Self {
         val
+    }
+
+    fn from_u16(val: u16) -> Self {
+        val as u8
     }
 
     fn as_u8(self) -> u8 {
@@ -54,6 +59,10 @@ impl RegisterSize for u16 {
 
     fn from_u8(val: u8) -> Self {
         val as u16
+    }
+
+    fn from_u16(val: u16) -> Self {
+        val
     }
 
     fn as_u8(self) -> u8 {
@@ -84,6 +93,7 @@ fn read_imm<T: RegisterSize>(emu: &mut Snes) -> T {
 fn effective_address<T: RegisterSize, const ADDR_MODE: AddressingMode>(emu: &mut Snes) -> u32 {
     match ADDR_MODE {
         Direct => direct_page_address(emu) as u32,
+        Absolute => absolute_address(emu),
         _ => todo!(),
     }
 }
@@ -96,4 +106,8 @@ fn direct_page_address(emu: &mut Snes) -> u16 {
         // extra cycle if the low byte of the direct Page register is not zero
     }
     ea
+}
+
+fn absolute_address(emu: &mut Snes) -> u32 {
+    emu.cpu.regs.data_bank() | read_imm::<u16>(emu) as u32
 }

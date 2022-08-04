@@ -47,7 +47,7 @@ pub struct Registers {
     // data bank, holds the current data bank address. When accessing an address
     // using the absolute addressing notation, the system uses this register to
     // determine the bank of the given address.
-    db: u8,
+    db: u32,
     // program bank, keeps track of the current bank of the currently executed instruction
     // e.g. if there is code executed at address $018009, this register will hold the value $01.
     pb: u32,
@@ -69,5 +69,13 @@ impl Registers {
 
     pub(crate) fn set_program_bank(&mut self, val: u8) {
         self.pb = (val as u32) << 16
+    }
+
+    pub(crate) fn data_bank(&self) -> u32 {
+        self.db
+    }
+
+    pub(crate) fn set_data_bank(&mut self, val: u8) {
+        self.db = (val as u32) << 16;
     }
 }
