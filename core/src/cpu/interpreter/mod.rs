@@ -1,3 +1,4 @@
+use crate::cpu::bus::AccessWidth;
 use crate::emu::Snes;
 
 use self::AddressingMode::*;
@@ -25,61 +26,12 @@ pub enum AddressingMode {
     StackRelativeIndirectY,
 }
 
-pub trait RegisterSize: Copy {
-    const IS_16: bool;
-
-    fn from_u8(val: u8) -> Self;
-    fn from_u16(val: u16) -> Self;
-    fn as_u8(self) -> u8;
-    fn as_u16(self) -> u16;
-}
-
-impl RegisterSize for u8 {
-    const IS_16: bool = false;
-
-    fn from_u8(val: u8) -> Self {
-        val
-    }
-
-    fn from_u16(val: u16) -> Self {
-        val as u8
-    }
-
-    fn as_u8(self) -> u8 {
-        self
-    }
-
-    fn as_u16(self) -> u16 {
-        self as u16
-    }
-}
-
-impl RegisterSize for u16 {
-    const IS_16: bool = true;
-
-    fn from_u8(val: u8) -> Self {
-        val as u16
-    }
-
-    fn from_u16(val: u16) -> Self {
-        val
-    }
-
-    fn as_u8(self) -> u8 {
-        self as u8
-    }
-
-    fn as_u16(self) -> u16 {
-        self
-    }
-}
-
 fn read_byte(emu: &mut Snes, addr: u32) -> u8 {
     todo!()
 }
 
 // read an 8 or 16 bit immediate value
-fn read_imm<T: RegisterSize>(emu: &mut Snes) -> T {
+fn read_imm<T: AccessWidth>(emu: &mut Snes) -> T {
     if T::IS_16 {
         todo!()
     } else {
@@ -90,7 +42,7 @@ fn read_imm<T: RegisterSize>(emu: &mut Snes) -> T {
 }
 
 // calculate the effective address for the given addressing mode
-fn effective_address<T: RegisterSize, const ADDR_MODE: AddressingMode>(emu: &mut Snes) -> u32 {
+fn effective_address<T: AccessWidth, const ADDR_MODE: AddressingMode>(emu: &mut Snes) -> u32 {
     match ADDR_MODE {
         Direct => direct_page_address(emu) as u32,
         Absolute => absolute_address(emu),
