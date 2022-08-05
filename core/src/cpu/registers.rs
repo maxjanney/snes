@@ -71,7 +71,7 @@ impl Registers {
         self.pb = (val as u32) << 16
     }
 
-    pub(crate) fn data_bank(&self) -> u32 {
+    pub(crate) const fn data_bank(&self) -> u32 {
         self.db
     }
 
