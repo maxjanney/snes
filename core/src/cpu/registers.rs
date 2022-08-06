@@ -30,9 +30,9 @@ pub struct Registers {
     // When x and y leave 16 bit mode, their high bytes get cleared to 0
     //
     // index register, can be treated as a 8 bits or 16 bits
-    x: u16,
+    pub x: u16,
     // index register, can be treated as a 8 bits or 16 bits
-    y: u16,
+    pub y: u16,
     // This register keeps track of the high and low bytes of the address of the currently executed instruction.
     // e.g. if there is an instruction executed at $018009, this register will hold the value $8009.
     pub pc: u16,

@@ -29,6 +29,10 @@ fn read_byte(emu: &mut Snes, addr: u32) -> u8 {
     todo!()
 }
 
+fn read_word(emu: &mut Snes, addr: u32) -> u32 {
+    read_byte(emu, addr) as u32 | (read_byte(emu, addr.wrapping_add(1)) as u32) << 8
+}
+
 fn read_word_bank_zero(emu: &mut Snes, addr: u16) -> u16 {
     (read_byte(emu, addr as u32) as u16) | (read_byte(emu, addr.wrapping_add(1) as u32) as u16) << 8
 }
@@ -37,7 +41,6 @@ fn read_indirect_addr(emu: &mut Snes, addr: u16) -> u32 {
     emu.cpu.regs.data_bank() | read_word_bank_zero(emu, addr) as u32
 }
 
-// read an 8 or 16 bit immediate value
 fn read_imm<T: AccessWidth>(emu: &mut Snes) -> T {
     if T::IS_16 {
         todo!()
@@ -48,8 +51,8 @@ fn read_imm<T: AccessWidth>(emu: &mut Snes) -> T {
     }
 }
 
-// calculate the effective address for the given addressing mode
 fn effective_address<T: AccessWidth, const ADDR_MODE: AddressingMode>(emu: &mut Snes) -> u32 {
+    // TODO: timings
     match ADDR_MODE {
         Direct => direct_page_address(emu) as u32,
         Absolute => absolute_address(emu),
@@ -57,11 +60,27 @@ fn effective_address<T: AccessWidth, const ADDR_MODE: AddressingMode>(emu: &mut 
             let addr = direct_page_address(emu);
             read_indirect_addr(emu, addr)
         }
+        DirectXIndirect => {
+            let addr = direct_page_address(emu).wrapping_add(emu.cpu.regs.x);
+            read_indirect_addr(emu, addr)
+        }
+        DirectIndirectY => {
+            let indirect = direct_page_address(emu);
+            let unindexed = read_indirect_addr(emu, indirect);
+            (unindexed + emu.cpu.regs.y as u32) & 0xffffff
+        }
+        DirectX => {
+            let direct = direct_page_address(emu);
+            direct.wrapping_add(emu.cpu.regs.x) as u32
+        }
+        DirectY => {
+            let direct = direct_page_address(emu);
+            direct.wrapping_add(emu.cpu.regs.y) as u32
+        }
         _ => todo!(),
     }
 }
 
-// calculate the effective address for direct page mode
 fn direct_page_address(emu: &mut Snes) -> u16 {
     let dp = emu.cpu.regs.dp;
     let ea = dp.wrapping_add(read_imm::<u8>(emu) as u16);
