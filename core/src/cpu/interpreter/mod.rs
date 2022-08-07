@@ -77,6 +77,20 @@ fn effective_address<T: AccessWidth, const ADDR_MODE: AddressingMode>(emu: &mut 
             let direct = direct_page_address(emu);
             direct.wrapping_add(emu.cpu.regs.y) as u32
         }
+        AbsoluteX => {
+            let unindexed = absolute_address(emu);
+            (unindexed + emu.cpu.regs.x as u32) & 0xffffff
+        }
+        AbsoluteY => {
+            let unindexed = absolute_address(emu);
+            (unindexed + emu.cpu.regs.y as u32) & 0xffffff
+        }
+        StackRelative => stack_relative(emu) as u32,
+        StackRelativeIndirectY => {
+            let indirect = stack_relative(emu);
+            let unindexed = read_indirect_addr(emu, indirect);
+            (unindexed + emu.cpu.regs.y as u32) & 0xffffff
+        }
         _ => todo!(),
     }
 }
@@ -92,4 +106,8 @@ fn direct_page_address(emu: &mut Snes) -> u16 {
 
 fn absolute_address(emu: &mut Snes) -> u32 {
     emu.cpu.regs.data_bank() | read_imm::<u16>(emu) as u32
+}
+
+fn stack_relative(emu: &mut Snes) -> u16 {
+    (read_imm::<u8>(emu) as u16).wrapping_add(emu.cpu.regs.sp)
 }

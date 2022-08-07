@@ -37,7 +37,7 @@ pub struct Registers {
     // e.g. if there is an instruction executed at $018009, this register will hold the value $8009.
     pub pc: u16,
     // stack pointer, holds the pointer to the stack in RAM, relative to address $000000
-    sp: u16,
+    pub sp: u16,
     // processor status register, holds the current processor flags
     psr: Psr,
     // direct page used for the direct page addressing mode
