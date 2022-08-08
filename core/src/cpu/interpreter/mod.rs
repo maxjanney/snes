@@ -1,4 +1,7 @@
-use crate::{cpu::bus::AccessWidth, emu::Snes};
+use crate::{
+    cpu::bus::AccessWidth,
+    emu::{self, Snes},
+};
 
 use self::AddressingMode::*;
 
@@ -10,8 +13,6 @@ pub enum AddressingMode {
     DirectIndirect,
     DirectXIndirect,
     DirectIndirectY,
-    AbsoluteIndirect,
-    AbsoluteXIndirect,
     DirectIndirectLong,
     DirectIndirectLongY,
     // indexed modes
@@ -19,6 +20,7 @@ pub enum AddressingMode {
     DirectY,
     AbsoluteX,
     AbsoluteY,
+    AbsoluteLong,
     AbsoluteLongX,
     // stack relative
     StackRelative,
@@ -99,13 +101,17 @@ fn effective_address<T: AccessWidth, const ADDR_MODE: AddressingMode>(emu: &mut 
             let unindexed = absolute_address(emu);
             (unindexed + emu.cpu.regs.y as u32) & 0xffffff
         }
+        AbsoluteLong => absolute_long(emu),
+        AbsoluteLongX => {
+            let long = absolute_long(emu);
+            (long + emu.cpu.regs.x as u32) & 0xffffff
+        }
         StackRelative => stack_relative(emu) as u32,
         StackRelativeIndirectY => {
             let indirect = stack_relative(emu);
             let unindexed = read_indirect_addr(emu, indirect);
             (unindexed + emu.cpu.regs.y as u32) & 0xffffff
         }
-        _ => todo!(),
     }
 }
 
@@ -124,4 +130,10 @@ fn absolute_address(emu: &mut Snes) -> u32 {
 
 fn stack_relative(emu: &mut Snes) -> u16 {
     (read_imm::<u8>(emu) as u16).wrapping_add(emu.cpu.regs.sp)
+}
+
+fn absolute_long(emu: &mut Snes) -> u32 {
+    let lohi = read_imm::<u16> as u32;
+    let bank = read_imm::<u8>(emu) as u32;
+    (bank << 16) | lohi
 }
