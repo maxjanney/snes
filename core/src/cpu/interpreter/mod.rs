@@ -1,7 +1,4 @@
-use crate::{
-    cpu::bus::AccessWidth,
-    emu::{self, Snes},
-};
+use crate::{cpu::bus::AccessWidth, emu::Snes};
 
 use self::AddressingMode::*;
 
