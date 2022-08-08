@@ -37,6 +37,11 @@ fn read_word_bank_zero(emu: &mut Snes, addr: u16) -> u16 {
     (read_byte(emu, addr as u32) as u16) | (read_byte(emu, addr.wrapping_add(1) as u32) as u16) << 8
 }
 
+fn read_long_bank_zero(emu: &mut Snes, addr: u16) -> u32 {
+    (read_byte(emu, addr.wrapping_add(2) as u32) as u32) << 16
+        | read_word_bank_zero(emu, addr) as u32
+}
+
 fn read_indirect_addr(emu: &mut Snes, addr: u16) -> u32 {
     emu.cpu.regs.data_bank() | read_word_bank_zero(emu, addr) as u32
 }
@@ -67,6 +72,15 @@ fn effective_address<T: AccessWidth, const ADDR_MODE: AddressingMode>(emu: &mut 
         DirectIndirectY => {
             let indirect = direct_page_address(emu);
             let unindexed = read_indirect_addr(emu, indirect);
+            (unindexed + emu.cpu.regs.y as u32) & 0xffffff
+        }
+        DirectIndirectLong => {
+            let indirect = direct_page_address(emu);
+            read_long_bank_zero(emu, indirect)
+        }
+        DirectIndirectLongY => {
+            let indirect = direct_page_address(emu);
+            let unindexed = read_long_bank_zero(emu, indirect);
             (unindexed + emu.cpu.regs.y as u32) & 0xffffff
         }
         DirectX => {
